@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -35,6 +37,12 @@ public class MainActivity extends AppCompatActivity {
         //startActivity(intent);
 
         listView = findViewById(R.id.listView);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //System.out.println("Clicked");
+            }
+        });
 
 
      //  downloadJSON("http://10.0.2.2:8080/api.php");
@@ -43,11 +51,7 @@ public class MainActivity extends AppCompatActivity {
         // downloadJSON("https://stackoverflow.com/questions/13775103/how-do-i-know-if-i-have-successfully-connected-to-the-url-i-opened-a-connection");
     }
 
-    public void button(){
-        Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                Uri.parse("google.navigation:q=an+address+city"));
-        startActivity(intent);
-    }
+
 
     private void downloadJSON(final String urlWebService) {
 
@@ -62,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
-                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
                 try {
                    loadIntoListView(s);
                 } catch (JSONException e) {
@@ -100,16 +103,21 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadIntoListView(String json) throws JSONException {
       JSONArray jsonArray = new JSONArray(json);
-       ArrayList<Destination> destinationList = new ArrayList<>();
+       ArrayList<Destination> destinations = new ArrayList<>();
         for(int i = 0; i<jsonArray.length(); i++){
             JSONObject data= jsonArray.getJSONObject(i);
             String adress=data.getString("Adresse");
             String name = data.getString("Name");
             String sort = data.getString("Sorte");
             Destination destination = new Destination(adress, name, sort);
-            destinationList.add(destination);
+            destinations.add(destination);
 
         }
+        CustomListAdapter adapter;
+        adapter = new CustomListAdapter
+                (getApplicationContext(), R.layout.custom_list_layout, destinations);
+        listView.setAdapter(adapter);
+
 
 
 

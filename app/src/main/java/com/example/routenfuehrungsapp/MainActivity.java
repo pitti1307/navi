@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,9 +33,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                Uri.parse("google.navigation:q=Berliner Str. 68 16540 Hohen Neuendorf"));
-        //startActivity(intent);
 
         listView = findViewById(R.id.listView);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -44,17 +42,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-     //  downloadJSON("http://10.0.2.2:8080/api.php");
           downloadJSON("https://zustellservice-ludwigsfelde.de/api.php");
 
-        // downloadJSON("https://stackoverflow.com/questions/13775103/how-do-i-know-if-i-have-successfully-connected-to-the-url-i-opened-a-connection");
     }
 
-
-
     private void downloadJSON(final String urlWebService) {
-
         class DownloadJSON extends AsyncTask<Void, Void, String> {
 
             @Override
@@ -62,12 +54,12 @@ public class MainActivity extends AppCompatActivity {
                 super.onPreExecute();
             }
 
-
             @Override
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
                 try {
-                   loadIntoListView(s);
+                   //loadIntoListView(s);
+                    loadTours(s);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -90,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-                    System.out.println(sb.toString());
+                   // System.out.println(sb.toString());
                     return sb.toString().trim();
                 } catch (Exception e) {
                     return null;
@@ -100,7 +92,44 @@ public class MainActivity extends AppCompatActivity {
         DownloadJSON getJSON = new DownloadJSON();
         getJSON.execute();
     }
+    private void loadTours(String json) throws JSONException {
+       JSONObject jsonObject = new JSONObject(json);
+       ArrayList<Tour> tours = new ArrayList<>();
+        Iterator<String> keys = jsonObject.keys();
+        ArrayList<Destination> destinations = new ArrayList<>();
+        ArrayList<String> keysArray = new ArrayList<>();
 
+        while(keys.hasNext()) {
+            String key = keys.next();
+            keysArray.add(key);
+
+        }
+
+        for(int i = 0; i<2; i++){
+            JSONArray jsonArray= jsonObject.getJSONArray(keysArray.get(i));
+            for(int j = 0; j<jsonArray.length(); j++) {
+
+                JSONObject destinationObject = jsonArray.getJSONObject(j);
+
+                String adress=destinationObject.getString("Adresse");
+                String name = destinationObject.getString("Name");
+                String sort = destinationObject.getString("Sorte");
+                Destination destination = new Destination(adress, name, sort);
+                destinations.add(destination);
+
+            }
+            Tour tour = new Tour(keysArray.get(i), destinations);
+            tours.add(tour);
+        }
+
+        CustomListAdapterMenu adapter;
+        adapter = new CustomListAdapterMenu (getApplicationContext(), R.layout.custom_list_layout, tours);
+
+        //adapter = new CustomListAdapter (getApplicationContext(), R.layout.custom_list_layout, destinations);
+        listView.setAdapter(adapter);
+
+
+    }
     private void loadIntoListView(String json) throws JSONException {
       JSONArray jsonArray = new JSONArray(json);
        ArrayList<Destination> destinations = new ArrayList<>();
@@ -117,8 +146,6 @@ public class MainActivity extends AppCompatActivity {
         adapter = new CustomListAdapter
                 (getApplicationContext(), R.layout.custom_list_layout, destinations);
         listView.setAdapter(adapter);
-
-
 
 
         /*String[] stocks = new String[jsonArray.length()];

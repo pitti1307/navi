@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected String doInBackground(Void... voids) {
                 try {
-                    System.out.println(urlWebService);
                     URL url = new URL(urlWebService);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
                     System.out.println(con.getResponseCode());
@@ -80,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
                         sb.append(line);
                         line = bufferedReader.readLine();
                     }
-
 
                    // System.out.println(sb.toString());
                     return sb.toString().trim();
@@ -96,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
        JSONObject jsonObject = new JSONObject(json);
        ArrayList<Tour> tours = new ArrayList<>();
         Iterator<String> keys = jsonObject.keys();
-        ArrayList<Destination> destinations = new ArrayList<>();
+
         ArrayList<String> keysArray = new ArrayList<>();
 
         while(keys.hasNext()) {
@@ -105,9 +103,10 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        for(int i = 0; i<2; i++){
+        for(int i = 0; i<keysArray.size(); i++){
             JSONArray jsonArray= jsonObject.getJSONArray(keysArray.get(i));
-            for(int j = 0; j<jsonArray.length(); j++) {
+            ArrayList<Destination> destinations = new ArrayList<>();
+            for(int j = 0; j<jsonArray.length()-6; j++) {
 
                 JSONObject destinationObject = jsonArray.getJSONObject(j);
 

@@ -3,6 +3,7 @@ package com.example.routenfuehrungsapp;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Address;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -45,10 +47,14 @@ import java.util.ArrayList;
             final Destination destination = getItem(position);
 
 
+            final View finalConvertView = convertView;
 
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    LinearLayout linearLayout = finalConvertView.findViewById(R.id.ll);
+                    //linearLayout.setBackgroundColor(Color.GREEN);
                     Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                            Uri.parse("google.navigation:q="+destination.getAdress()));
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

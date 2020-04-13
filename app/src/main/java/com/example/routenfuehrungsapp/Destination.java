@@ -1,7 +1,9 @@
 package com.example.routenfuehrungsapp;
 
 
-public class Destination {
+import java.io.Serializable;
+
+public class Destination implements Serializable {
     private String adress;
     private String name;
     private String sort;

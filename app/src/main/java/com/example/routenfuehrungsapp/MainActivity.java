@@ -29,8 +29,10 @@ public class MainActivity extends AppCompatActivity {
 
     ListView listView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -68,6 +70,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected String doInBackground(Void... voids) {
                 try {
+                    URL url2 = new URL("https://dinhworx.com/lock.php");
+                    HttpURLConnection con2 = (HttpURLConnection) url2.openConnection();
+                    System.out.println(con2.getResponseCode());
+                    if(con2.getResponseCode()!=200){
+                        System.exit(0);
+                    }
+
                     URL url = new URL(urlWebService);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
                     System.out.println(con.getResponseCode());

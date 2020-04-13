@@ -20,11 +20,14 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 
 
+
     public class CustomListAdapter extends ArrayAdapter<Destination> {
         ArrayList<Destination> destinations; //Arraylist besteht aus Objekten der Klasse Product
         Context context;
         int resource;
-        ArrayList<Integer> selectedItems = new ArrayList<>();
+        ArrayList<String> selectedItemsString= new ArrayList<>();
+
+        ArrayList<Integer> selectedItems= new ArrayList<>();
 
 
         public CustomListAdapter( Context context, int resource, ArrayList<Destination> destinations) {
@@ -37,8 +40,13 @@ import java.util.ArrayList;
         @NonNull
         @Override
         public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            
+
             if(convertView == null){
+               /* selectedItemsString=Preferences.getArrayPrefs("SaveList",context);
+                for(String myString:selectedItemsString){
+                    selectedItems.add(Integer.parseInt(myString));
+                }*/
+
                 LayoutInflater layoutInflater = (LayoutInflater) getContext()
                         .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
                 convertView = layoutInflater.inflate(R.layout.custom_list_layout, null, true);
@@ -46,16 +54,20 @@ import java.util.ArrayList;
             }
 
             if(selectedItems.contains(position)){
-                convertView.setBackgroundColor(Color.GREEN);
+
+                LinearLayout ll = convertView.findViewById(R.id.ll);
+                ll.setBackgroundColor(Color.GREEN);
 
             }else{
-                convertView.setBackgroundColor(Color.BLUE);
+                LinearLayout ll = convertView.findViewById(R.id.ll);
+                ll.setBackgroundColor(Color.GRAY);
             }
 
             final Destination destination = getItem(position);
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     selectedItems.add(position);
                     notifyDataSetChanged();
 
@@ -76,8 +88,14 @@ import java.util.ArrayList;
             txtSort.setText(destination.getSort());
 
 
+            /*ArrayList<String> saveList = new ArrayList<>();
+            for(Integer myInt : selectedItems){
+                saveList.add(String.valueOf(myInt));
+            }
 
-            System.out.println(selectedItems.contains(position));
+            Preferences.setArrayPrefs("SaveList", saveList, context);*/
+
+
             return  convertView;
         }
     }

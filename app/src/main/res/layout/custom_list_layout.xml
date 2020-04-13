@@ -10,7 +10,7 @@
     <LinearLayout
         android:elevation="10dp"
         android:id="@+id/ll"
-        android:background="@drawable/my_selector"
+        android:background="@android:color/holo_blue_light"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="0.7"

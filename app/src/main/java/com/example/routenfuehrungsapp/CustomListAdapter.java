@@ -24,6 +24,7 @@ import java.util.ArrayList;
         ArrayList<Destination> destinations; //Arraylist besteht aus Objekten der Klasse Product
         Context context;
         int resource;
+        ArrayList<Integer> selectedItems = new ArrayList<>();
 
 
         public CustomListAdapter( Context context, int resource, ArrayList<Destination> destinations) {
@@ -35,8 +36,8 @@ import java.util.ArrayList;
 
         @NonNull
         @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-
+        public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            
             if(convertView == null){
                 LayoutInflater layoutInflater = (LayoutInflater) getContext()
                         .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
@@ -44,17 +45,20 @@ import java.util.ArrayList;
 
             }
 
+            if(selectedItems.contains(position)){
+                convertView.setBackgroundColor(Color.GREEN);
+
+            }else{
+                convertView.setBackgroundColor(Color.BLUE);
+            }
+
             final Destination destination = getItem(position);
-
-
-            final View finalConvertView = convertView;
-
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    selectedItems.add(position);
+                    notifyDataSetChanged();
 
-                    LinearLayout linearLayout = finalConvertView.findViewById(R.id.ll);
-                    //linearLayout.setBackgroundColor(Color.GREEN);
                     Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                            Uri.parse("google.navigation:q="+destination.getAdress()));
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -73,10 +77,7 @@ import java.util.ArrayList;
 
 
 
-
-
-
-
+            System.out.println(selectedItems.contains(position));
             return  convertView;
         }
     }

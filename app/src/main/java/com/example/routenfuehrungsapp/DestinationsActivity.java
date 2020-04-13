@@ -16,7 +16,7 @@ public class DestinationsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_destinations);
         ArrayList<Destination> destinations = (ArrayList<Destination>) getIntent().getSerializableExtra("Destinations");
         listView = findViewById(R.id.listView);
-
+       // listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         CustomListAdapter adapter;
 
         adapter = new CustomListAdapter (getApplicationContext(), R.layout.custom_list_layout, destinations);

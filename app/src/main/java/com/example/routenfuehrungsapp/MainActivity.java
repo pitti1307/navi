@@ -117,7 +117,8 @@ public class MainActivity extends AppCompatActivity {
                 destinations.add(destination);
 
             }
-            Tour tour = new Tour(keysArray.get(i), destinations);
+            String tourName = keysArray.get(i).replace("_", " ");
+            Tour tour = new Tour(tourName, destinations);
             tours.add(tour);
         }
 

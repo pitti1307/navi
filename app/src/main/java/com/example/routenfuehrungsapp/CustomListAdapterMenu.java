@@ -43,7 +43,6 @@ public class CustomListAdapterMenu extends ArrayAdapter<Tour> {
         final Tour tour= getItem(position);
 
 
-
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,17 +50,14 @@ public class CustomListAdapterMenu extends ArrayAdapter<Tour> {
 
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra("Destinations", tour.getDestinations());
+                intent.putExtra("TourName", tour.getName());
                 context.startActivity(intent);
-
 
             }
         });
 
         TextView txtName = convertView.findViewById(R.id.txtName);
         txtName.setText(tour.getName());
-
-
-
 
 
         return  convertView;

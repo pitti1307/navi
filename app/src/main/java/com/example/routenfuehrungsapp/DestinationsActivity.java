@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ListView;
@@ -31,30 +32,27 @@ public class DestinationsActivity extends AppCompatActivity {
     ArrayList<Destination> destinations;
     Map<String, String> map;
     JSONObject jsonObject;
-    String name, tour, dateString;
+    String userName, tour, dateString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_destinations);
+
         destinations = (ArrayList<Destination>) getIntent().getSerializableExtra("Destinations");
+        tour = getIntent().getStringExtra("TourName");
+        System.out.println(tour);
         listView = findViewById(R.id.listView);
        // listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-        adapter = new CustomListAdapter (getApplicationContext(), R.layout.custom_list_layout, destinations);
+        adapter = new CustomListAdapter (getApplicationContext(), R.layout.custom_list_layout, destinations, tour);
         listView.setAdapter(adapter);
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
         dateString = dateFormat.format(date);
+        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", 0);
+        userName = sharedPreferences.getString("userName", "");
 
-        map = new HashMap<>();
-        map.put("ID", "1");
-        map.put("Name", "Max Müller");
-        map.put("Tour", "Birkenwerder");
-        map.put("Datum", dateString);
-        jsonObject = new JSONObject(map);
-        name="Max";
-        tour="Birkenwerder";
 
 
     }
@@ -63,14 +61,15 @@ public class DestinationsActivity extends AppCompatActivity {
         if (adapter.selectedItems.size()!=destinations.size()){
             new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Tour beenden")
-                    .setMessage("Are you sure you want to close this activity?")
+                    .setTitle("Achtung! Tour noch nicht vollständig absolviert!")
+                    .setMessage("Sind Sie sicher, dass Sie die Tour beenden möchten? Die jetzige Zeit wird dann als Ihre Arbeitszeit eingetragen!")
                     .setPositiveButton("Ja", new DialogInterface.OnClickListener()
                     {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             finish();
-                            new CallAPI().execute("http://192.168.64.2/upload_api.php");
+                            Sender sender = new Sender(userName, tour, dateString);
+                            sender.execute("https://zustellservice-ludwigsfelde.de/upload_api.php");
                         }
                     })
                     .setNegativeButton("Nein", null)
@@ -79,63 +78,6 @@ public class DestinationsActivity extends AppCompatActivity {
         else{finish();}
 
     }
-    public class CallAPI extends AsyncTask<String, Void, Void> {
 
-        public CallAPI(){
-            //set context variables if required
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(String... params) {
-            String urlString = params[0]; // URL to call
-
-            try {
-                URL url = new URL(urlString);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("POST");
-                urlConnection.setConnectTimeout(20000);
-                urlConnection.setReadTimeout(20000);
-                urlConnection.setDoInput(true);
-                urlConnection.setDoOutput(true);
-
-                OutputStream outputStream = urlConnection.getOutputStream();
-                //WRITE
-                BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(outputStream, "UTF-8"));
-
-                writer.write(new DataPackager(name,tour,dateString).packData());
-                writer.flush();
-                writer.close();
-                outputStream.close();
-
-               // urlConnection.connect();
-                System.out.println(urlConnection.getResponseCode());
-
-                if(urlConnection.getResponseCode()==urlConnection.HTTP_OK){
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
-                            urlConnection.getInputStream()));
-                    StringBuffer response = new StringBuffer();
-
-                    String line;
-
-                    while ((line=bufferedReader.readLine()) != null){
-                        response.append(line);
-                    }
-                    bufferedReader.close();
-
-                    System.out.println(response.toString());
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-    }
 
 }

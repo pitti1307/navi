@@ -47,14 +47,14 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", 0);
 
         text = sharedPreferences.getString("userName", "");
         System.out.println(text);
 
         showAlertDialog();
-        Sender sender = new Sender("asd","adsd","das");
-        sender.execute("http://192.168.64.2/upload_api.php");
+        //Sender sender = new Sender("asd","adsd","das");
+        //sender.execute("http://192.168.64.2/upload_api.php");
         listView = findViewById(R.id.listView);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

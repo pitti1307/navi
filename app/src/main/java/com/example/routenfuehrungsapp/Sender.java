@@ -13,14 +13,11 @@ import java.net.URL;
 public class Sender extends AsyncTask<String,Void,Void> {
     String name, tour, dateString;
 
-
     public Sender(String name, String tour, String dateString) {
         this.name = name;
         this.tour = tour;
         this.dateString = dateString;
     }
-
-
 
     @Override
     protected void onPreExecute() {

@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     String userName;
     private String m_Text = "";
+    String text;
 
 
 
@@ -48,11 +49,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
 
-        String text = sharedPreferences.getString("userName", "");
+        text = sharedPreferences.getString("userName", "");
         System.out.println(text);
 
+        showAlertDialog();
+        Sender sender = new Sender("asd","adsd","das");
+        sender.execute("http://192.168.64.2/upload_api.php");
+        listView = findViewById(R.id.listView);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //System.out.println("Clicked");
+            }
+        });
+
+          downloadJSON("https://zustellservice-ludwigsfelde.de/api.php");
+
+    }
+    public void showAlertDialog(){
+
         if(text.isEmpty()){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Bitte geben Sie Ihren vollen Namen ein.");
 
             // Set up the input
@@ -66,28 +83,26 @@ public class MainActivity extends AppCompatActivity {
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    m_Text = input.getText().toString();
-                    SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("userName", m_Text);
-                    editor.apply();
-                    System.out.println("Hallo");
+                    if(input.getText().toString().length()==0){
+                        dialog.cancel();
+                        showAlertDialog();
+                        Toast.makeText(getApplicationContext(), "Eingabe darf nicht leer sein!", Toast.LENGTH_SHORT).show();
+
+                    }else {
+                        m_Text = input.getText().toString();
+                        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("userName", m_Text);
+                        editor.apply();
+                    }
                 }
             });
 
+
             builder.setCancelable(false);
-            builder.show();
+            final AlertDialog alert = builder.create();
+            alert.show();
         }
-        listView = findViewById(R.id.listView);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //System.out.println("Clicked");
-            }
-        });
-
-          downloadJSON("https://zustellservice-ludwigsfelde.de/api.php");
-
     }
 
     private void downloadJSON(final String urlWebService) {

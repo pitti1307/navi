@@ -42,7 +42,8 @@ import java.util.ArrayList;
         public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
             if(convertView == null){
-               /* selectedItemsString=Preferences.getArrayPrefs("SaveList",context);
+               // selectedItems= DataHolder.getInstance().selectedItems;
+                /*selectedItemsString=Preferences.getArrayPrefs("SaveList",context);
                 for(String myString:selectedItemsString){
                     selectedItems.add(Integer.parseInt(myString));
                 }*/
@@ -67,8 +68,16 @@ import java.util.ArrayList;
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if(!selectedItems.contains(position)){
+                    selectedItems.add(position);}
+                    //DataHolder.getInstance().setArray(selectedItems);
 
-                    selectedItems.add(position);
+                    /*ArrayList<String> saveList = new ArrayList<>();
+                    for(Integer myInt : selectedItems){
+                        saveList.add(String.valueOf(myInt));
+                    }
+                    Preferences.setArrayPrefs("SaveList", saveList, context);*/
+
                     notifyDataSetChanged();
 
                     Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
@@ -87,13 +96,11 @@ import java.util.ArrayList;
             TextView txtSort = convertView.findViewById(R.id.txtSort);
             txtSort.setText(destination.getSort());
 
+            if(!selectedItems.contains(position)){
+                selectedItems.add(position);}
+            notifyDataSetChanged();
 
-            /*ArrayList<String> saveList = new ArrayList<>();
-            for(Integer myInt : selectedItems){
-                saveList.add(String.valueOf(myInt));
-            }
 
-            Preferences.setArrayPrefs("SaveList", saveList, context);*/
 
 
             return  convertView;

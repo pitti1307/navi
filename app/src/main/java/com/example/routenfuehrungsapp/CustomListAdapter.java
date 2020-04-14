@@ -25,8 +25,6 @@ import java.util.ArrayList;
         ArrayList<Destination> destinations; //Arraylist besteht aus Objekten der Klasse Product
         Context context;
         int resource;
-        ArrayList<String> selectedItemsString= new ArrayList<>();
-
         ArrayList<Integer> selectedItems= new ArrayList<>();
 
 
@@ -42,16 +40,9 @@ import java.util.ArrayList;
         public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
             if(convertView == null){
-               // selectedItems= DataHolder.getInstance().selectedItems;
-                /*selectedItemsString=Preferences.getArrayPrefs("SaveList",context);
-                for(String myString:selectedItemsString){
-                    selectedItems.add(Integer.parseInt(myString));
-                }*/
-
                 LayoutInflater layoutInflater = (LayoutInflater) getContext()
                         .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
                 convertView = layoutInflater.inflate(R.layout.custom_list_layout, null, true);
-
             }
 
             if(selectedItems.contains(position)){
@@ -70,13 +61,6 @@ import java.util.ArrayList;
                 public void onClick(View v) {
                     if(!selectedItems.contains(position)){
                     selectedItems.add(position);}
-                    //DataHolder.getInstance().setArray(selectedItems);
-
-                    /*ArrayList<String> saveList = new ArrayList<>();
-                    for(Integer myInt : selectedItems){
-                        saveList.add(String.valueOf(myInt));
-                    }
-                    Preferences.setArrayPrefs("SaveList", saveList, context);*/
 
                     notifyDataSetChanged();
 
@@ -96,13 +80,12 @@ import java.util.ArrayList;
             TextView txtSort = convertView.findViewById(R.id.txtSort);
             txtSort.setText(destination.getSort());
 
+            //select all items - for testing
+            /*
             if(!selectedItems.contains(position)){
                 selectedItems.add(position);}
             notifyDataSetChanged();
-
-
-
-
+            */
             return  convertView;
         }
     }

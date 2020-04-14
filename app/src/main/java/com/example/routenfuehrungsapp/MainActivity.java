@@ -2,13 +2,21 @@ package com.example.routenfuehrungsapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.text.InputType;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -28,6 +36,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     ListView listView;
+    String userName;
+    private String m_Text = "";
+
 
 
     @Override
@@ -35,7 +46,38 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
 
+        String text = sharedPreferences.getString("userName", "");
+        System.out.println(text);
+
+        if(text.isEmpty()){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Bitte geben Sie Ihren vollen Namen ein.");
+
+            // Set up the input
+            final EditText input = new EditText(this);
+            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            input.setGravity(Gravity.CENTER);
+            builder.setView(input);
+
+            // Set up the buttons
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    m_Text = input.getText().toString();
+                    SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("userName", m_Text);
+                    editor.apply();
+                    System.out.println("Hallo");
+                }
+            });
+
+            builder.setCancelable(false);
+            builder.show();
+        }
         listView = findViewById(R.id.listView);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -139,30 +181,5 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    private void loadIntoListView(String json) throws JSONException {
-      JSONArray jsonArray = new JSONArray(json);
-       ArrayList<Destination> destinations = new ArrayList<>();
-        for(int i = 0; i<jsonArray.length(); i++){
-            JSONObject data= jsonArray.getJSONObject(i);
-            String adress=data.getString("Adresse");
-            String name = data.getString("Name");
-            String sort = data.getString("Sorte");
-            Destination destination = new Destination(adress, name, sort);
-            destinations.add(destination);
 
-        }
-        CustomListAdapter adapter;
-        adapter = new CustomListAdapter
-                (getApplicationContext(), R.layout.custom_list_layout, destinations);
-        listView.setAdapter(adapter);
-
-
-        /*String[] stocks = new String[jsonArray.length()];
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject obj = jsonArray.getJSONObject(i);
-            stocks[i] = obj.getString("name") + " " + obj.getString("price");
-        }*/
-        //ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stocks);
-        //listView.setAdapter(arrayAdapter);
-    }
 }

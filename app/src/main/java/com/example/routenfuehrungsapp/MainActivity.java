@@ -150,8 +150,6 @@ public class MainActivity extends AppCompatActivity {
                     System.out.println(path);
                     readCSV(path);
 
-
-
     }
 
     public void showAlertDialog(){
@@ -258,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i<keysArray.size(); i++){
             JSONArray jsonArray= jsonObject.getJSONArray(keysArray.get(i));
             ArrayList<Destination> destinations = new ArrayList<>();
+            ArrayList<String> tourInfo = new ArrayList<>();
             for(int j = 0; j<jsonArray.length()-6; j++) {
 
                 JSONObject destinationObject = jsonArray.getJSONObject(j);
@@ -265,12 +264,18 @@ public class MainActivity extends AppCompatActivity {
                 String adress=destinationObject.getString("Adresse");
                 String name = destinationObject.getString("Name");
                 String sort = destinationObject.getString("Sorte");
-                Destination destination = new Destination(adress, name, sort);
+                String info = destinationObject.getString("Info's");
+                Destination destination = new Destination(adress, name, sort,info);
                 destinations.add(destination);
 
             }
+            for(int k= jsonArray.length()-5; k<jsonArray.length(); k++){
+                JSONObject destinationObject = jsonArray.getJSONObject(k);
+                String infoLine = destinationObject.getString("Adresse") + ": "+ destinationObject.getString("Name");
+                tourInfo.add(infoLine);
+            }
             String tourName = keysArray.get(i).replace("_", " ");
-            Tour tour = new Tour(tourName, destinations);
+            Tour tour = new Tour(tourName, destinations, tourInfo);
             tours.add(tour);
         }
 

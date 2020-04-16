@@ -1,13 +1,16 @@
 package com.example.routenfuehrungsapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,7 +45,33 @@ public class CustomListAdapterMenu extends ArrayAdapter<Tour> {
 
         final Tour tour= getItem(position);
 
+        ImageView imageView = convertView.findViewById(R.id.info_icon);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+
+
+                AlertDialog.Builder alertbox = new AlertDialog.Builder(v.getRootView().getContext());
+                StringBuilder sb = new StringBuilder();
+                for(String info: tour.getInfos()){
+                    sb.append(info);
+                    sb.append("\n");
+                }
+                alertbox.setMessage(sb.toString());
+                alertbox.setTitle("Gesamt");
+
+                alertbox.setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface arg0,
+                                                int arg1) {
+
+                            }
+                        });
+                alertbox.show();
+            }
+        });
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

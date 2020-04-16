@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+
+import org.apache.commons.lang3.ObjectUtils;
+import org.w3c.dom.Text;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -30,9 +34,9 @@ public class CustomListAdapter extends ArrayAdapter<Destination> {
         int resource;
         ArrayList<Integer> selectedItems= new ArrayList<>();
         SharedPreferences sharedPreferences;
-        String userName;
-        String tour;
-        Boolean sent=false;
+        String userName, tour;
+        boolean sent = false;
+
 
         public CustomListAdapter( Context context, int resource, ArrayList<Destination> destinations, String tour) {
             super(context, resource, destinations);
@@ -41,55 +45,58 @@ public class CustomListAdapter extends ArrayAdapter<Destination> {
             this.resource = resource;
             this.tour = tour;
         }
-    private Drawable getDrawableWithRadius() {
 
-        GradientDrawable gradientDrawable   =   new GradientDrawable();
-        gradientDrawable.setCornerRadii(new float[]{20, 20, 20, 20, 20, 20, 20, 20});
-        gradientDrawable.setColor(Color.RED);
-
-        return gradientDrawable;
-    }
         @NonNull
         @Override
         public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            //System.out.println(tour);
 
+            final Destination destination = getItem(position);
             if(convertView == null){
                 LayoutInflater layoutInflater = (LayoutInflater) getContext()
                         .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
                 convertView = layoutInflater.inflate(R.layout.custom_list_layout, null, true);
             }
+            LinearLayout ll = convertView.findViewById(R.id.ll);
+            TextView infoTxt = convertView.findViewById(R.id.txtInfo);
+
+
+            if(destination.getInfo().equals("")){
+
+                infoTxt.setVisibility(View.GONE);
+
+            }else{
+                infoTxt.setVisibility(View.VISIBLE);
+                infoTxt.setText(destination.getInfo());
+            }
 
             if(selectedItems.contains(position)){
-                LinearLayout ll = convertView.findViewById(R.id.ll);
                 ll.setBackground(ContextCompat.getDrawable(context, R.drawable.shape2));
                 TextView textView1 = convertView.findViewById(R.id.txtName);
                 TextView textView2 = convertView.findViewById(R.id.txtAdress);
                 TextView textView3 = convertView.findViewById(R.id.txtSort);
 
-
                 textView1.setTextColor(Color.BLACK);
-
                 textView2.setTextColor(Color.BLACK);
                 textView3.setTextColor(Color.BLACK);
-
+                if(infoTxt!=null){
+                    infoTxt.setTextColor(Color.BLACK);
+                }
 
 
             }else{
-                LinearLayout ll = convertView.findViewById(R.id.ll);
                 ll.setBackground(ContextCompat.getDrawable(context, R.drawable.shape1));
                 TextView textView1 = convertView.findViewById(R.id.txtName);
                 TextView textView2 = convertView.findViewById(R.id.txtAdress);
                 TextView textView3 = convertView.findViewById(R.id.txtSort);
 
-
                 textView1.setTextColor(Color.WHITE);
-
                 textView2.setTextColor(Color.WHITE);
                 textView3.setTextColor(Color.WHITE);
+                if(infoTxt!=null){
+                    infoTxt.setTextColor(Color.WHITE);
+                }
             }
 
-            final Destination destination = getItem(position);
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

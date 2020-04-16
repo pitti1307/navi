@@ -30,8 +30,6 @@ public class DestinationsActivity extends AppCompatActivity {
     ListView listView;
     CustomListAdapter adapter;
     ArrayList<Destination> destinations;
-    Map<String, String> map;
-    JSONObject jsonObject;
     String userName, tour, dateString;
 
     @Override
@@ -43,7 +41,6 @@ public class DestinationsActivity extends AppCompatActivity {
         tour = getIntent().getStringExtra("TourName");
         System.out.println(tour);
         listView = findViewById(R.id.listView);
-       // listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         adapter = new CustomListAdapter (getApplicationContext(), R.layout.custom_list_layout, destinations, tour);
         listView.setAdapter(adapter);
@@ -52,7 +49,6 @@ public class DestinationsActivity extends AppCompatActivity {
         dateString = dateFormat.format(date);
         SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", 0);
         userName = sharedPreferences.getString("userName", "");
-
 
 
     }
@@ -76,8 +72,6 @@ public class DestinationsActivity extends AppCompatActivity {
                     .show();
         }
         else{finish();}
-
     }
-
 
 }

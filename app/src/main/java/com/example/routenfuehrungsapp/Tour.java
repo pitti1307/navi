@@ -5,11 +5,21 @@ import java.util.ArrayList;
 public class Tour {
     private String name;
     private ArrayList<Destination> destinations;
+    private ArrayList<String> infos;
 
-    public Tour(String name, ArrayList<Destination> destinations){
+    public Tour(String name, ArrayList<Destination> destinations, ArrayList<String> infos){
         this.name = name;
         this.destinations = destinations;
+        this.infos = infos;
 
+    }
+
+    public ArrayList<String> getInfos() {
+        return infos;
+    }
+
+    public void setInfos(ArrayList<String> infos) {
+        this.infos = infos;
     }
 
     public String getName() {

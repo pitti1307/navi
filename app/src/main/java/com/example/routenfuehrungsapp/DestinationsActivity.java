@@ -52,6 +52,8 @@ public class DestinationsActivity extends AppCompatActivity {
 
 
     }
+
+
     @Override
     public void onBackPressed() {
         if (adapter.selectedItems.size()!=destinations.size()){

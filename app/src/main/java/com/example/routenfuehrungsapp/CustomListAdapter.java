@@ -7,13 +7,11 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.location.Address;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -64,11 +62,31 @@ public class CustomListAdapter extends ArrayAdapter<Destination> {
 
             if(selectedItems.contains(position)){
                 LinearLayout ll = convertView.findViewById(R.id.ll);
-                ll.setBackgroundColor(Color.GREEN);
+                ll.setBackground(ContextCompat.getDrawable(context, R.drawable.shape2));
+                TextView textView1 = convertView.findViewById(R.id.txtName);
+                TextView textView2 = convertView.findViewById(R.id.txtAdress);
+                TextView textView3 = convertView.findViewById(R.id.txtSort);
+
+
+                textView1.setTextColor(Color.BLACK);
+
+                textView2.setTextColor(Color.BLACK);
+                textView3.setTextColor(Color.BLACK);
+
+
 
             }else{
                 LinearLayout ll = convertView.findViewById(R.id.ll);
-                ll.setBackground(ContextCompat.getDrawable(context, R.drawable.my_custom_background));
+                ll.setBackground(ContextCompat.getDrawable(context, R.drawable.shape1));
+                TextView textView1 = convertView.findViewById(R.id.txtName);
+                TextView textView2 = convertView.findViewById(R.id.txtAdress);
+                TextView textView3 = convertView.findViewById(R.id.txtSort);
+
+
+                textView1.setTextColor(Color.WHITE);
+
+                textView2.setTextColor(Color.WHITE);
+                textView3.setTextColor(Color.WHITE);
             }
 
             final Destination destination = getItem(position);

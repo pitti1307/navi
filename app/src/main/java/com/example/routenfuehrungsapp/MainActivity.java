@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", 0);
-        importCSV();
+        //importCSV();
         text = sharedPreferences.getString("userName", "");
         System.out.println(text);
 
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     public void importCSV(){
-        btnImportCSV = findViewById(R.id.button);
+       // btnImportCSV = findViewById(R.id.button);
         btnImportCSV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

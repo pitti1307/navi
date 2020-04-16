@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.location.Address;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,8 +36,6 @@ public class CustomListAdapter extends ArrayAdapter<Destination> {
         String tour;
         Boolean sent=false;
 
-
-
         public CustomListAdapter( Context context, int resource, ArrayList<Destination> destinations, String tour) {
             super(context, resource, destinations);
             this.destinations = destinations;
@@ -42,11 +43,18 @@ public class CustomListAdapter extends ArrayAdapter<Destination> {
             this.resource = resource;
             this.tour = tour;
         }
+    private Drawable getDrawableWithRadius() {
 
+        GradientDrawable gradientDrawable   =   new GradientDrawable();
+        gradientDrawable.setCornerRadii(new float[]{20, 20, 20, 20, 20, 20, 20, 20});
+        gradientDrawable.setColor(Color.RED);
+
+        return gradientDrawable;
+    }
         @NonNull
         @Override
         public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            System.out.println(tour);
+            //System.out.println(tour);
 
             if(convertView == null){
                 LayoutInflater layoutInflater = (LayoutInflater) getContext()
@@ -60,7 +68,7 @@ public class CustomListAdapter extends ArrayAdapter<Destination> {
 
             }else{
                 LinearLayout ll = convertView.findViewById(R.id.ll);
-                ll.setBackgroundColor(Color.GRAY);
+                ll.setBackground(ContextCompat.getDrawable(context, R.drawable.my_custom_background));
             }
 
             final Destination destination = getItem(position);

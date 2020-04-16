@@ -8,9 +8,9 @@
 
 
     <LinearLayout
-        android:elevation="10dp"
         android:id="@+id/ll"
-        android:background="@android:color/holo_blue_light"
+
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="0.7"
@@ -24,26 +24,30 @@
         >
 
         <TextView
+            android:layout_gravity="center"
             android:id="@+id/txtName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Product Name"
             android:textSize="15sp"
-            android:textColor="#000000"/>
+            android:textColor="#FFFFFF"/>
         <TextView
+            android:layout_gravity="center"
+
             android:id="@+id/txtAdress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Product Price"
             android:textSize="15sp"
-            android:textColor="#000000"/>
+            android:textColor="#FFFFFF"/>
         <TextView
+            android:layout_gravity="center"
             android:id="@+id/txtSort"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Zahlen Information"
             android:textSize="15sp"
-            android:textColor="#000000"/>
+            android:textColor="#FFFFFF"/>
 
 
 

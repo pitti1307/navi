@@ -47,6 +47,7 @@ import com.opencsv.CSVReader;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -66,10 +67,12 @@ import java.util.List;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
+    TextView textViewImported;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     TinyDB tinydb;
-    CustomListAdapterMenu adapter, adapterImported;
+    CustomListAdapterMenu adapter;
+    CustomListAdapterImported adapterImported;
     ArrayList<Tour> tours, toursImported;
     ListView listView, listViewImported;
     private String m_Text = "";//getUserName()
@@ -87,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        toursImported= new ArrayList<>();
         tinydb = new TinyDB(this);
         toursImported=tinydb.getListObject("ToursImported");
 
@@ -103,9 +108,14 @@ public class MainActivity extends AppCompatActivity {
         listView = findViewById(R.id.listView);
         listViewImported = findViewById(R.id.listViewImported);
 
-        adapterImported = new CustomListAdapterMenu (getApplicationContext(), R.layout.custom_list_layout, toursImported);
+        adapterImported = new CustomListAdapterImported (this, R.layout.custom_list_layout, toursImported);
 
         listViewImported.setAdapter(adapterImported);
+        if(toursImported.size()!=0){
+            textViewImported = findViewById(R.id.textView3);
+
+            textViewImported.setVisibility(View.VISIBLE);
+        }
 
         downloadJSON("https://zustellservice-ludwigsfelde.de/api.php");
         verifyStoragePermissions(this);
@@ -211,37 +221,72 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readCSV(final String path){
-                try {
-                    CSVReader reader = new CSVReader(new FileReader(path));
-                    String[] nextLine;
-                    ArrayList<Destination> destinations = new ArrayList<>();
-                    ArrayList<String> tourInfo = new ArrayList<>();
-                    tourInfo.add("Hallo");
-                    String tourName = null;
-                    int count = 0;
 
-                    while ((nextLine = reader.readNext()) != null) {
-                        if(count == 0){
-                            tourName = nextLine[1];
-                            count++;
+
+            final String[] tourName = new String[1];
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Bitte benennen Sie die Tour");
+
+                    // Set up the input
+                    final EditText input = new EditText(this);
+                    // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    input.setGravity(Gravity.CENTER);
+                    builder.setView(input);
+
+                    // Set up the buttons
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if(input.getText().toString().length()==0){
+                                dialog.cancel();
+                                getUserName();
+                                Toast.makeText(getApplicationContext(), "Eingabe darf nicht leer sein!", Toast.LENGTH_SHORT).show();
+
+                            }else {
+                                tourName[0] = input.getText().toString();
+                                try{
+
+                                    CSVReader reader = new CSVReader(new FileReader(path));
+                                    String[] nextLine;
+                                    ArrayList<Destination> destinations = new ArrayList<>();
+                                    ArrayList<String> tourInfo = new ArrayList<>();
+                                    tourInfo.add("Hallo");
+                                    int count = 0;
+
+                                    while ((nextLine = reader.readNext()) != null) {
+                                        if(nextLine[1].equals("")){
+                                            break;
+                                        }
+                                        if(nextLine[0].equals("")|| nextLine[0].equals("Adresse")){
+                                                    continue;
+                                            }
+                                        Destination destination = new Destination(nextLine[0], nextLine[1], nextLine[2], nextLine[3]);
+                                        destinations.add(destination);
+
+                                    }
+                                    Tour tour = new Tour(tourName[0], destinations, tourInfo );
+                                    toursImported.add(tour);
+                                    adapterImported.notifyDataSetChanged();
+                                    tinydb.putListObject("ToursImported", toursImported);
+                                    textViewImported = findViewById(R.id.textView3);
+
+                                    textViewImported.setVisibility(View.VISIBLE);
+
+
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
                         }
-                        if(nextLine[0].equals("") || nextLine[1].equals("") || nextLine[0].equals("#")){
-                            continue;
-                        }
-                        Destination destination = new Destination(nextLine[1], nextLine[2], nextLine[3], nextLine[4]);
-                        destinations.add(destination);
+                    });
 
-                    }
-                    System.out.println(tourName);
-                    Tour tour = new Tour(tourName, destinations, tourInfo );
-                    toursImported.add(tour);
-                    adapterImported.notifyDataSetChanged();
-                    tinydb.putListObject("ToursImported", toursImported);
+                    builder.setCancelable(false);
+                    final AlertDialog alert = builder.create();
+                    alert.show();
 
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
     }
     private void isExternalStorageReadable(){
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())

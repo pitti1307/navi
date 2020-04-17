@@ -8,6 +8,7 @@
     tools:context=".MainActivity"
     android:clickable="true"
     android:focusableInTouchMode="true"
+    android:orientation="vertical"
     >
 
 
@@ -45,24 +46,48 @@
 
     </ListView>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="100dp"
 
-        android:layout_marginTop="100dp"
-        android:layout_marginEnd="100dp"
-        android:orientation="horizontal"
+    <TextView
+
+        android:id="@+id/textView"
+        android:layout_width="150dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="130dp"
+        android:layout_marginLeft="130dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="131dp"
+        android:layout_marginRight="131dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/shape1"
+        android:gravity="center"
+        android:text="CSV Import"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/listView">
+        app:layout_constraintTop_toBottomOf="@+id/listView" />
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginStart="100dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginBottom="75dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
 
 
         <EditText
             android:id="@+id/editText"
-            android:layout_marginRight="5dp"
             android:layout_width="300dp"
             android:layout_height="45dp"
+            android:layout_marginRight="5dp"
             android:background="@drawable/shape_edit_text"
             android:ems="10"
             android:gravity="center"
@@ -72,14 +97,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/listView" />
 
-        <ImageView
 
+        <ImageView
             android:id="@+id/searchBtn"
             android:layout_width="50dp"
             android:layout_height="45dp"
             android:background="@drawable/shape1"
             android:src="@drawable/search_icon"
-
 
             >
 

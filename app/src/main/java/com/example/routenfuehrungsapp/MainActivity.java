@@ -8,17 +8,26 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -30,6 +39,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.opencsv.CSVReader;
@@ -42,8 +52,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -52,25 +64,32 @@ import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+    CustomListAdapterMenu adapter;
+    ArrayList<Tour> tours;
     ListView listView;
     private String m_Text = "";
     String text;
-    Button btnImportCSV, btnRead;
     Intent myFileIntent;
     String path="/storage/emulated/0/Download/Birkenwerder.csv";
     ImageView imageView;
+    String path2="/document/msf:25";
+    String path3="/data/user/0/com.example.routenfuehrungsapp/files/Birkenwerder.csv";
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        imageView= findViewById(R.id.imageView);
-        //imageView.setImageResource(R.drawable.logo);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        imageView = findViewById(R.id.imageView);
         SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", 0);
-        //importCSV();
         text = sharedPreferences.getString("userName", "");
-        System.out.println(text);
 
         showAlertDialog();
 
@@ -79,7 +98,45 @@ public class MainActivity extends AppCompatActivity {
         downloadJSON("https://zustellservice-ludwigsfelde.de/api.php");
         verifyStoragePermissions(this);
         manualAdressInput();
+        importCSV();
+    }
+    private static String getFilePathForN(Uri uri, Context context) {
+        Uri returnUri = uri;
+        Cursor returnCursor = context.getContentResolver().query(returnUri, null, null, null, null);
+        /*
+         * Get the column indexes of the data in the Cursor,
+         *     * move to the first row in the Cursor, get the data,
+         *     * and display it.
+         * */
+        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+        returnCursor.moveToFirst();
+        String name = (returnCursor.getString(nameIndex));
+        String size = (Long.toString(returnCursor.getLong(sizeIndex)));
+        File file = new File(context.getFilesDir(), name);
+        try {
+            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+            FileOutputStream outputStream = new FileOutputStream(file);
+            int read = 0;
+            int maxBufferSize = 1 * 1024 * 1024;
+            int bytesAvailable = inputStream.available();
 
+            //int bufferSize = 1024;
+            int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+
+            final byte[] buffers = new byte[bufferSize];
+            while ((read = inputStream.read(buffers)) != -1) {
+                outputStream.write(buffers, 0, read);
+            }
+            Log.e("File Size", "Size " + file.length());
+            inputStream.close();
+            outputStream.close();
+            Log.e("File Path", "Path " + file.getPath());
+
+        } catch (Exception e) {
+            Log.e("Exception", e.getMessage());
+        }
+        return file.getPath();
     }
 
     public void hideKeyboard(View view) {
@@ -126,20 +183,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    // Storage Permissions
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
 
-    /**
-     * Checks if the app has permission to write to device storage
-     *
-     * If the app does not has permission then the user will be prompted to grant permissions
-     *
-     * @param activity
-     */
     public static void verifyStoragePermissions(Activity activity) {
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -153,19 +197,31 @@ public class MainActivity extends AppCompatActivity {
             );
         }
     }
+
     private void readCSV(final String path){
 
                 try {
                     CSVReader reader = new CSVReader(new FileReader(path));
                     String[] nextLine;
+                    ArrayList<Destination> destinations = new ArrayList<>();
+                    ArrayList<String> tourInfo = new ArrayList<>();
+                    tourInfo.add("Hallo");
+
                     while ((nextLine = reader.readNext()) != null) {
-                        // nextLine[] is an array of values from the line
-                        System.out.println(nextLine[0] + nextLine[1] + "etc...");
+                        if(nextLine[0].equals("") || nextLine[1].equals("") || nextLine[1].equals("Name")){
+                            continue;
+                        }
+                        Destination destination = new Destination(nextLine[1], nextLine[2], nextLine[3], nextLine[4]);
+                        destinations.add(destination);
+
                     }
+                    Tour tour = new Tour("Test", destinations, tourInfo );
+                    tours.add(tour);
+                    adapter.notifyDataSetChanged();
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
 
     }
     private void isExternalStorageReadable(){
@@ -177,8 +233,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     public void importCSV(){
-       // btnImportCSV = findViewById(R.id.button);
-        btnImportCSV.setOnClickListener(new View.OnClickListener() {
+        TextView csvImportBtn = findViewById(R.id.textView);
+        csvImportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 myFileIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -193,11 +249,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
                     String path = data.getData().getPath();
-
                     System.out.println(path);
-                    readCSV(path);
+
+                    readCSV(getFilePathForN(data.getData(),this));
 
     }
 
@@ -291,15 +346,13 @@ public class MainActivity extends AppCompatActivity {
     }
     private void loadTours(String json) throws JSONException {
        JSONObject jsonObject = new JSONObject(json);
-       ArrayList<Tour> tours = new ArrayList<>();
+       tours = new ArrayList<>();
         Iterator<String> keys = jsonObject.keys();
-
         ArrayList<String> keysArray = new ArrayList<>();
 
         while(keys.hasNext()) {
             String key = keys.next();
             keysArray.add(key);
-
         }
 
         for(int i = 0; i<keysArray.size(); i++){
@@ -328,7 +381,7 @@ public class MainActivity extends AppCompatActivity {
             tours.add(tour);
         }
 
-        CustomListAdapterMenu adapter;
+
         adapter = new CustomListAdapterMenu (getApplicationContext(), R.layout.custom_list_layout, tours);
 
         listView.setAdapter(adapter);

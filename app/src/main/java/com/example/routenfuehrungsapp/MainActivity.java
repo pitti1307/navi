@@ -60,20 +60,24 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
-    CustomListAdapterMenu adapter;
-    ArrayList<Tour> tours;
-    ListView listView;
-    private String m_Text = "";
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
+    TinyDB tinydb;
+    CustomListAdapterMenu adapter, adapterImported;
+    ArrayList<Tour> tours, toursImported;
+    ListView listView, listViewImported;
+    private String m_Text = "";//getUserName()
     String text;
     Intent myFileIntent;
-    String path="/storage/emulated/0/Download/Birkenwerder.csv";
+    String path="/storage/emulated/0/Download/Birkenwerder.csv", path2="/document/msf:25",
+            path3="/data/user/0/com.example.routenfuehrungsapp/files/Birkenwerder.csv";
     ImageView imageView;
-    String path2="/document/msf:25";
-    String path3="/data/user/0/com.example.routenfuehrungsapp/files/Birkenwerder.csv";
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -83,21 +87,29 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        tinydb = new TinyDB(this);
+        toursImported=tinydb.getListObject("ToursImported");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         imageView = findViewById(R.id.imageView);
-        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", 0);
+        //save username
+       sharedPreferences = getSharedPreferences("sharedPrefs", 0);
         text = sharedPreferences.getString("userName", "");
 
-        showAlertDialog();
+        getUserName();
 
         listView = findViewById(R.id.listView);
+        listViewImported = findViewById(R.id.listViewImported);
+
+        adapterImported = new CustomListAdapterMenu (getApplicationContext(), R.layout.custom_list_layout, toursImported);
+
+        listViewImported.setAdapter(adapterImported);
 
         downloadJSON("https://zustellservice-ludwigsfelde.de/api.php");
         verifyStoragePermissions(this);
-        manualAdressInput();
+        manualAdressInput(); //
         importCSV();
     }
     private static String getFilePathForN(Uri uri, Context context) {
@@ -199,30 +211,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readCSV(final String path){
-
                 try {
                     CSVReader reader = new CSVReader(new FileReader(path));
                     String[] nextLine;
                     ArrayList<Destination> destinations = new ArrayList<>();
                     ArrayList<String> tourInfo = new ArrayList<>();
                     tourInfo.add("Hallo");
+                    String tourName = null;
+                    int count = 0;
 
                     while ((nextLine = reader.readNext()) != null) {
-                        if(nextLine[0].equals("") || nextLine[1].equals("") || nextLine[1].equals("Name")){
+                        if(count == 0){
+                            tourName = nextLine[1];
+                            count++;
+                        }
+                        if(nextLine[0].equals("") || nextLine[1].equals("") || nextLine[0].equals("#")){
                             continue;
                         }
                         Destination destination = new Destination(nextLine[1], nextLine[2], nextLine[3], nextLine[4]);
                         destinations.add(destination);
 
                     }
-                    Tour tour = new Tour("Test", destinations, tourInfo );
-                    tours.add(tour);
-                    adapter.notifyDataSetChanged();
+                    System.out.println(tourName);
+                    Tour tour = new Tour(tourName, destinations, tourInfo );
+                    toursImported.add(tour);
+                    adapterImported.notifyDataSetChanged();
+                    tinydb.putListObject("ToursImported", toursImported);
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
     }
     private void isExternalStorageReadable(){
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
@@ -256,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void showAlertDialog(){
+    public void getUserName(){
         if(text.isEmpty()){
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Bitte geben Sie Ihren vollen Namen ein.");
@@ -274,13 +293,13 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     if(input.getText().toString().length()==0){
                         dialog.cancel();
-                        showAlertDialog();
+                        getUserName();
                         Toast.makeText(getApplicationContext(), "Eingabe darf nicht leer sein!", Toast.LENGTH_SHORT).show();
 
                     }else {
                         m_Text = input.getText().toString();
                         SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor = sharedPreferences.edit();
                         editor.putString("userName", m_Text);
                         editor.apply();
                     }
@@ -381,12 +400,9 @@ public class MainActivity extends AppCompatActivity {
             tours.add(tour);
         }
 
-
         adapter = new CustomListAdapterMenu (getApplicationContext(), R.layout.custom_list_layout, tours);
 
         listView.setAdapter(adapter);
 
-
     }
-
 }
